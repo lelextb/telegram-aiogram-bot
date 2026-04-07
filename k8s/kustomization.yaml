@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: telegram-bot
+resources:
+  - namespace.yaml
+  - postgres/postgres-pvc.yaml
+  - postgres/postgres-deployment.yaml
+  - postgres/postgres-service.yaml
+  - redis/redis-deployment.yaml
+  - redis/redis-service.yaml
+  - bot/bot-configmap.yaml
+  - bot/bot-secret.yaml
+  - bot/bot-deployment.yaml
+  - bot/bot-service.yaml
+  - bot/bot-ingress.yaml

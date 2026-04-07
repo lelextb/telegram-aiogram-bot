@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: telegram-bot
+  namespace: telegram-bot
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: telegram-bot
+  template:
+    metadata:
+      labels:
+        app: telegram-bot
+    spec:
+      containers:
+      - name: bot
+        image: telegram-bot:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: BOT_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: bot-secret
+              key: BOT_TOKEN
+        - name: DATABASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: bot-config
+              key: DATABASE_URL
+        - name: REDIS_URL
+          valueFrom:
+            configMapKeyRef:
+              name: bot-config
+              key: REDIS_URL
+        - name: WEBHOOK_URL
+          valueFrom:
+            configMapKeyRef:
+              name: bot-config
+              key: WEBHOOK_URL
+        - name: WEBHOOK_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: bot-secret
+              key: WEBHOOK_SECRET
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
